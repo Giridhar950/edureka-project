@@ -5,11 +5,9 @@ pipeline{
 apiVersion: v1
 kind: Pod
 spec:
-  hostname: linux-test
   containers:
-    - name: jnlp
+    - name: linux
       image:  'ubuntu:18.04'
-      imagePullPolicy: IfNotPresent
 """
         }
 }
