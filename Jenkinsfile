@@ -3,7 +3,7 @@ pipeline {
         dockerfile true
     }
     stages {
-        stage('Main') {
+        stage('Some stage') {
             steps {
                 sh 'hostname'
             }
