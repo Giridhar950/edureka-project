@@ -1,0 +1,79 @@
+pipeline{
+    agent none
+    stages {
+        stage('.') {
+            parallel {
+                stage('windows') {
+                    agent {
+                        kubernetes {
+                            yaml """\
+apiVersion: v1
+kind: Pod
+spec:
+  hostname: windows-test
+  containers:
+    - name: jnlp
+      image: 'jenkins/inbound-agent:windowsservercore-1809'
+      workingDir: /home/jenkins
+      imagePullPolicy: IfNotPresent
+    - name: win-cntr
+      image: mcr.microsoft.com/windows/servercore:ltsc2022
+      imagePullPolicy: IfNotPresent
+      tty: true
+      command:
+        - powershell
+      ports:
+        - containerPort: 80
+"""
+		}
+	}
+                    stages {
+                        stage("step1") {
+                            steps {
+                                script {
+									                bat 'dir'
+                                }
+                            }
+                        }
+                        stage("step2") {
+                            steps {
+                                script {
+                                    bat 'echo hello>test.txt'
+									                  bat 'dir'
+                                }
+                            }
+                        }
+					}
+                }
+                stage('linux') {
+                    agent {
+                        kubernetes {
+                            yaml """\
+apiVersion: v1
+kind: Pod
+spec:
+  hostname: linux-test
+  containers:
+    - name: jnlp
+      image:  'ubuntu:18.04'
+      imagePullPolicy: IfNotPresent
+"""
+        }
+    }
+                    stages {
+                        stage("step1") {
+                            steps {
+                                sh 'ls -al'
+                            }
+                        }
+                        stage("step2") {
+                            steps {
+                                sh 'pwd'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
